@@ -5,6 +5,9 @@ from sklearn import metrics
 # Notes
 #
 # reference https://www.w3schools.com/python/python_ml_confusion_matrix.asp
+# https://en.wikipedia.org/wiki/Confusion_matrix
+#
+# TODO
 # might implement Traits later
 # might add distribution plotting if needed
 #______________________________________________________________________________________________________________
