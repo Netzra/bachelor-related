@@ -6,6 +6,7 @@ from sklearn import metrics
 #
 # reference https://www.w3schools.com/python/python_ml_confusion_matrix.asp
 # might implement Traits later
+# might add distribution plotting if needed
 #______________________________________________________________________________________________________________
 
 
@@ -38,6 +39,11 @@ class ConfusionMatrix:
 
     def f_score(self):
         print("f_score: " + str(metrics.f1_score(self.actual, self.predicted)))
+
+
+#_____________________________________________________________________________________________________________________________
+# For Debugging
+#_____________________________________________________________________________________________________________________________
 
 
 if __name__ == "__main__":
