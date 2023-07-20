@@ -1,0 +1,147 @@
+import pandas as pd
+from matplotlib import pyplot as plt
+from matplotlib.ticker import MaxNLocator
+import statistics as stats
+import sklearn.metrics as metrics
+import numpy as np
+
+#TODO umschreiben fuer Listen
+def calculate_mae(actual, perceived):
+
+    if len(actual) != len(perceived):
+        raise ValueError ("Die Listen muessen gleich gross sein")
+
+    absoluteerr = [perceived[i]-actual[i] for i in range(actual.__len__())]
+    mae = np.mean(absoluteerr)
+    return mae
+
+def calculate_mae(actual_values, perceived_values):
+    # Überprüfen, ob die Längen der Listen gleich sind
+    if len(actual_values) != len(perceived_values):
+        raise ValueError("Die Längen der Listen müssen gleich sein.")
+
+    # Berechnung des MSE
+    squared_errors = [(perceived_values[i] - actual_values[i]) ** 2 for i in range(len(actual_values))]
+    mse = sum(squared_errors) / len(actual_values)
+    return mse
+
+sublist = (
+    'sub_23', 'sub_24', 'sub_10', 'sub_08', 'sub_20', 'sub_13', 'sub_12', 'sub_22', 'sub_07', 'sub_18', 'sub_06',
+    'sub_21',
+    'sub_14', 'sub_11')
+
+sol2 = []
+sol3 = []
+sol4 = []
+sol5 = []
+sol6 = []
+mean = []
+x = [2, 3, 4, 5, 6]
+
+dfvNum = pd.read_pickle("/Users/netzra/Downloads/Dataframes/vertical/numjudge_dfv")
+
+for position in range(dfvNum.solution.__len__()):
+    if dfvNum.solution.to_list()[position] == 2 and dfvNum.response.to_list()[position] != None:
+        sol2.append(dfvNum.response.to_list()[position])
+    if dfvNum.solution.to_list()[position] == 3 and dfvNum.response.to_list()[position] != None:
+        sol3.append(dfvNum.response.to_list()[position])
+    if dfvNum.solution.to_list()[position] == 4 and dfvNum.response.to_list()[position] != None:
+        sol4.append(dfvNum.response.to_list()[position])
+    if dfvNum.solution.to_list()[position] == 5 and dfvNum.response.to_list()[position] != None:
+        sol5.append(dfvNum.response.to_list()[position])
+    if dfvNum.solution.to_list()[position] == 6 and dfvNum.response.to_list()[position] != None:
+        sol6.append(dfvNum.response.to_list()[position])
+
+mean.append(stats.mean(sol2))
+mean.append(stats.mean(sol3))
+mean.append(stats.mean(sol4))
+mean.append(stats.mean(sol5))
+mean.append(stats.mean(sol6))
+
+#implementation of errorterm
+err = []
+temp2=[2] * sol2.__len__()
+temp3=[3] * sol3.__len__()
+temp4=[4] * sol4.__len__()
+temp5=[5] * sol5.__len__()
+temp6=[6] * sol6.__len__()
+
+err.append(calculate_mae(temp2, sol2))
+err.append(calculate_mae(temp3, sol3))
+err.append(calculate_mae(temp4, sol4))
+err.append(calculate_mae(temp5, sol5))
+err.append(calculate_mae(temp6, sol6))
+
+"""
+err.append(metrics.mean_squared_error(temp2,sol2))
+err.append(metrics.mean_squared_error(temp3,sol3))
+err.append(metrics.mean_squared_error(temp4,sol4))
+err.append(metrics.mean_squared_error(temp5,sol5))
+err.append(metrics.mean_squared_error(temp6,sol6))
+"""
+
+ax = plt.figure().gca()
+ax.xaxis.set_major_locator(MaxNLocator(integer= True))
+
+plt.errorbar(x,mean,err )
+plt.plot(x, x)
+plt.xlabel("Amount of Speaker")
+plt.ylabel("mean perveived amount of speaker")
+plt.title("Mean perceived Amount of speakers over all participants")
+plt.show()
+
+#localisation
+dfvloc = pd.read_pickle("/Users/netzra/Downloads/Dataframes/vertical/locaaccu_dfv")
+
+actual = []
+response=[]
+err=[]
+responseVSactual = {
+    37.5: [],
+    25.0: [],
+    12.5: [],
+    0.0:[],
+    -12.5:[],
+    -25.0:[],
+    -37.5:[]
+}
+t1 = dfvloc.actual.to_list()
+t2 =dfvloc.perceived.to_list()
+mean =[]
+
+for position in range(t1.__len__()):
+    if t1 [position] != None:
+        actual.append(t1[position][1])
+        response.append(t2[position][1])
+
+for position in range (actual.__len__()):
+    if actual[position] == 37.5:
+        responseVSactual[37.5].append(response[position])
+    if actual[position] == 25.0:
+        responseVSactual[25.0].append(response[position])
+    if actual[position] == 12.5:
+        responseVSactual[12.5].append(response[position])
+    if actual[position] == 0.0:
+        responseVSactual[0.0].append(response[position])
+    if actual[position] == -12.5:
+        responseVSactual[-12.5].append(response[position])
+    if actual[position] == -25.0:
+        responseVSactual[-25.0].append(response[position])
+    if actual[position] == -37.5:
+        responseVSactual[-37.5].append(response[position])
+
+for value in responseVSactual.keys():
+    mean.append(stats.mean(responseVSactual[value]))
+    err.append(metrics.mean_squared_error([value]*responseVSactual[value].__len__(),responseVSactual[value]))
+
+plt.plot(responseVSactual.keys(),responseVSactual.keys())
+#plt.errorbar(responseVSactual.keys(), mean, err)
+plt.plot(responseVSactual.keys(),mean)
+plt.xlabel("position loudspeaker (degrees)")
+plt.ylabel("perceived position of loudspeaker (degrees)")
+plt.title("Average periceved position of loudspeaker for each of the loudspeakers")
+plt.show()
+
+#spatMask
+
+dfvspatMask = pd.read_pickle("/Users/netzra/Downloads/Dataframes/vertical/spatmask_dfv")
