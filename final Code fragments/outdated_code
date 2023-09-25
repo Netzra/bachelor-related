@@ -1,0 +1,567 @@
+#_________________________________________________________
+# Most of this code is outdated, was run via console
+# Some of the parts were still used however
+#_________________________________________________________
+import pandas as pd
+import matplotlib
+from matplotlib import pyplot as plt
+import statistics as stats
+import sklearn.metrics as metrics
+import numpy as np
+import Functions as f
+import scipy.stats
+
+#TODO umschreiben fuer Listen
+
+sublist = (
+    'sub_23', 'sub_24', 'sub_10', 'sub_08', 'sub_20', 'sub_13', 'sub_12', 'sub_22', 'sub_07', 'sub_18', 'sub_06',
+    'sub_21',
+    'sub_14', 'sub_11')
+
+sol2 = []
+sol3 = []
+sol4 = []
+sol5 = []
+sol6 = []
+mean = []
+x = [2, 3, 4, 5, 6]
+
+dfvNum = pd.read_pickle("/Users/netzra/Downloads/Dataframes/vertical/numjudge_dfv")
+
+for position in range(dfvNum.solution.__len__()):
+    if dfvNum.solution.to_list()[position] == 2 and dfvNum.response.to_list()[position] != None:
+        sol2.append(dfvNum.response.to_list()[position])
+    if dfvNum.solution.to_list()[position] == 3 and dfvNum.response.to_list()[position] != None:
+        sol3.append(dfvNum.response.to_list()[position])
+    if dfvNum.solution.to_list()[position] == 4 and dfvNum.response.to_list()[position] != None:
+        sol4.append(dfvNum.response.to_list()[position])
+    if dfvNum.solution.to_list()[position] == 5 and dfvNum.response.to_list()[position] != None:
+        sol5.append(dfvNum.response.to_list()[position])
+    if dfvNum.solution.to_list()[position] == 6 and dfvNum.response.to_list()[position] != None:
+        sol6.append(dfvNum.response.to_list()[position])
+
+mean.append(stats.mean(sol2))
+mean.append(stats.mean(sol3))
+mean.append(stats.mean(sol4))
+mean.append(stats.mean(sol5))
+mean.append(stats.mean(sol6))
+
+#implementation of errorterm
+var = []
+temp2=[2] * sol2.__len__()
+temp3=[3] * sol3.__len__()
+temp4=[4] * sol4.__len__()
+temp5=[5] * sol5.__len__()
+temp6=[6] * sol6.__len__()
+
+"""
+err.append(calculate_mae(temp2, sol2))
+err.append(calculate_mae(temp3, sol3))
+err.append(calculate_mae(temp4, sol4))
+err.append(calculate_mae(temp5, sol5))
+err.append(calculate_mae(temp6, sol6))
+
+"""
+var.append(metrics.mean_squared_error(temp2, sol2))
+var.append(metrics.mean_squared_error(temp3, sol3))
+var.append(metrics.mean_squared_error(temp4, sol4))
+var.append(metrics.mean_squared_error(temp5, sol5))
+var.append(metrics.mean_squared_error(temp6, sol6))
+
+solutionnumJudge = dfvNum.solution.to_list()
+responsenumJudge = dfvNum.response.to_list()
+solution = []
+response = []
+
+for index in range (responsenumJudge.__len__()):
+    if responsenumJudge [index] != None:
+        solution.append(solutionnumJudge[index])
+        response.append(responsenumJudge[index])
+
+
+
+standarddeviationOfMean1= []
+standarddeviationOfMean1.append(np.std(sol2)/np.sqrt(sol2.__len__()))
+standarddeviationOfMean1.append(np.std(sol3)/np.sqrt(sol3.__len__()))
+standarddeviationOfMean1.append(np.std(sol4)/np.sqrt(sol4.__len__()))
+standarddeviationOfMean1.append(np.std(sol5)/np.sqrt(sol5.__len__()))
+standarddeviationOfMean1.append(np.std(sol6)/np.sqrt(sol6.__len__()))
+
+ax = matplotlib.pyplot.figure().gca()
+ax.xaxis.set_major_locator(matplotlib.MaxNLocator(integer= True))
+
+#https://www.geeksforgeeks.org/how-to-do-exponential-and-logarithmic-curve-fitting-in-python/
+#x_log=np.log(x)
+#curve= np.polyfit(x_log,mean,1)
+# y_log = [1.1362116757980043 *float(value)+1.4071580565093682 for value in x]
+
+
+matplotlib.pyplot.errorbar(x,mean, standarddeviationOfMean1, fmt='.')
+matplotlib.pyplot.grid()
+#plt.plot(x_log, y_log  )
+matplotlib.pyplot.plot(x, x, color='gray',alpha=0.5)
+
+matplotlib.pyplot.xlabel("Amount of Speaker")
+matplotlib.pyplot.ylabel("Average perceived amount of speaker")
+matplotlib.pyplot.grid(alpha=0.2)
+matplotlib.pyplot.show()
+
+#reversed vs unreversed
+
+dfvNum = pd.read_pickle("/Users/netzra/Downloads/Dataframes/vertical/numjudge_dfv")
+
+# what we can get : amount of experiments, type of experiment (true, false), responses and solutions
+
+# the amount of outputs we get from a index call of a participant = the amount of experiments
+# we iterate over a list between 0 - 74 for each index in that list we get *amount of experiments* outputs,
+# which we distribute into dictionaries based on the fact if they are reversed or not
+
+reversed = {}
+unreversed = {}
+
+#iterating over pandas subject list
+for subject in dfvNum.index.get_level_values(0).drop_duplicates('first').to_list():
+    #iterating over total amount of values of one experiment (75 for vertical plane)
+    for value in range (1, dfvNum.index.get_level_values(1).drop_duplicates('first').__len__()):
+        #iterating over total amount of experiment parts per participant in plane
+        for experimentcount in range(dfvNum.loc[subject].reversed_speech.dropna().__len__()):
+            #checking if reversed speech is true ... 1
+            if dfvNum.loc[subject].reversed_speech.dropna().to_list()[experimentcount] == True:
+                # checking if key already exists in reversed ... 2
+                if dfvNum.loc[subject]["solution"][value].tolist()[experimentcount] in reversed:
+                    #appending response value to solution in reversed
+                    reversed[dfvNum.loc[subject]["solution"][value].to_list()[experimentcount]].append(dfvNum.loc[subject]["response"][value].to_list()[experimentcount])
+                # ... or not 2
+                else:
+                    # setting first key - Value pair, value pair has to be safed in a list
+                    reversed[dfvNum.loc[subject]["solution"][value].to_list()[experimentcount]] = [dfvNum.loc[subject]["response"][value].to_list()[experimentcount]]
+            # ... or not 1
+            if dfvNum.loc[subject].reversed_speech.dropna().to_list()[experimentcount] == False:
+                if dfvNum.loc[subject]["solution"][value].tolist()[experimentcount] in unreversed:
+                   unreversed[dfvNum.loc[subject]["solution"][value].to_list()[experimentcount]].append(dfvNum.loc[subject]["response"][value].to_list()[experimentcount])
+                else:
+                    unreversed[dfvNum.loc[subject]["solution"][value].to_list()[experimentcount]] = [dfvNum.loc[subject]["response"][value].to_list()[experimentcount]]
+
+reversed = dict(sorted(reversed.items()))
+unreversed = dict (sorted(unreversed.items()))
+
+reversed["mean"] = []
+reversed["std"] = []
+reversed["sem"] = []
+reversed["shapiro"]=[]
+unreversed ["mean"] = []
+unreversed ["std"] = []
+unreversed ["sem"] = []
+unreversed["shapiro"]=[]
+x = []
+
+for value in reversed.keys():
+    if type(value) == int:
+        reversed["mean"].append(np.mean(reversed.get(value)))
+        reversed["std"].append(np.std(reversed.get(value)))
+        reversed["sem"].append(np.std(reversed.get(value))/np.sqrt(reversed.get(value).__len__()))
+        reversed["shapiro"].append(scipy.stats.shapiro(reversed.get(value)))
+        unreversed ["mean"].append(np.mean(unreversed.get(value)))
+        unreversed ["std"].append(np.std(unreversed.get(value)))
+        unreversed ["sem"].append(np.std(unreversed.get(value))/np.sqrt(unreversed.get(value).__len__()))
+        unreversed["shapiro"].append(scipy.stats.shapiro(unreversed.get(value)))
+        x.append(value)
+font={
+    'family':'Times New Roman',
+    'weight':'normal',
+    'size':14
+}
+matplotlib.rc('font',**font)
+pyplot.plot(x, x, color= 'gray',alpha= .5)
+pyplot.errorbar(x, reversed.get("mean"),reversed.get("sem"), fmt='.',label='reversed' )
+pyplot.errorbar(x, unreversed.get("mean"),unreversed.get("sem"), fmt='.', color= 'black', label='clear', ecolor='gray')
+pyplot.grid(alpha=.2)
+pyplot.legend()
+pyplot.show()
+
+#what we need in our plot:
+# xaxes actual amount of speakers, y axes perceived amount
+# standarddeviation of the mean as errorterm
+# mean perceived vs actual for both reversed and unreversed, not connected lines, plus perfect performance function
+
+#localisation
+dfvloc = pd.read_pickle("/Users/netzra/Downloads/Dataframes/vertical/locaaccu_dfv")
+
+actual = []
+response=[]
+var=[]
+
+responseVSactual = {
+    37.5: [],
+    25.0: [],
+    12.5: [],
+    0.0:[],
+    -12.5:[],
+    -25.0:[],
+    -37.5:[]
+}
+t1 = dfvloc.actual.to_list()
+t2 =dfvloc.perceived.to_list()
+mean =[]
+standarddeviationOfMean = []
+
+for position in range(t1.__len__()):
+    if t1 [position] != None:
+        actual.append(t1[position][1])
+        response.append(t2[position][1])
+
+for position in range (actual.__len__()):
+    if actual[position] == 37.5:
+        responseVSactual[37.5].append(response[position])
+    if actual[position] == 25.0:
+        responseVSactual[25.0].append(response[position])
+    if actual[position] == 12.5:
+        responseVSactual[12.5].append(response[position])
+    if actual[position] == 0.0:
+        responseVSactual[0.0].append(response[position])
+    if actual[position] == -12.5:
+        responseVSactual[-12.5].append(response[position])
+    if actual[position] == -25.0:
+        responseVSactual[-25.0].append(response[position])
+    if actual[position] == -37.5:
+        responseVSactual[-37.5].append(response[position])
+
+for value in responseVSactual.keys():
+    mean.append(stats.mean(responseVSactual[value]))
+    standarddeviationOfMean.append(np.std(responseVSactual[value])/np.sqrt(responseVSactual[value].__len__()))
+
+"""
+for index in range (t1.__len__()):
+    if responsenumJudge [index] != None:
+        solution.append(t1[index])
+        response.append(t2[index])
+"""
+
+print([f.calculate_mse([37.5,25.0,12.5,0.0,-12.5,-25.0,-37.5],mean)])
+plt.plot(responseVSactual.keys(),responseVSactual.keys(), color='gray', alpha=0.5)
+plt.errorbar(responseVSactual.keys(), mean, standarddeviationOfMean)
+#plt.plot(responseVSactual.keys(),mean)
+plt.xlabel("position loudspeaker (in degrees)")
+plt.ylabel("perceived position of loudspeaker (in degrees)")
+plt.grid(alpha=0.2)
+
+plt.show()
+
+#saving the data per participant
+dfvloc = pd.read_pickle("/Users/netzra/Downloads/Dataframes/vertical/locaaccu_dfv")
+
+xValues = []
+
+for value in dfvloc.actual.dropna().drop_duplicates('first').to_list():
+    xValues.append(value[1])
+xValues = sorted(xValues)
+AverageHeadpositionPerLoudspeaker = {}
+participantLinRegress = {}
+participantLinRegress ["order"] = ["Slope","Intercept","MeanSquaredError", "R^2","p_value", "std_err"]
+
+for subject in dfvloc.index.get_level_values(0).dropna().drop_duplicates('first'):
+    AverageHeadpositionPerLoudspeaker [subject] = []
+
+# x values dont need to be saved for every participant, since it is always the same.
+#going through dataframe, saving the mean for every loudspeaker per participant
+# going over to loops, outer loop over participants.
+# inner loop going over x values
+# and saving every response of certain value in a temporary list
+# and safes the mean in a dictionary containing all the participants
+
+for subject in dfvloc.index.get_level_values(0).dropna().drop_duplicates('first'):
+    for x in xValues:
+        temp = []
+        for index in range (1, dfvloc.index.get_level_values(1).dropna().drop_duplicates('first').__len__()):
+            for position in range (dfvloc.loc[subject]["actual"][index].to_list().__len__()):
+                if dfvloc.loc[subject]["actual"][index].to_list()[position][1] == x:
+                    temp.append(dfvloc.loc[subject]["perceived"][index].to_list()[position][1])
+        AverageHeadpositionPerLoudspeaker[subject].append(np.mean(temp))
+
+#calculating elevation gain
+# https://www.geeksforgeeks.org/solving-linear-regression-in-python/
+x = np.array(xValues)
+n = np.size(xValues)
+xmean = np.mean(xValues)
+
+AverageHeadpositionPerLoudspeaker ["all"] = []
+standarddeviationOfMean2 = []
+
+
+for value in range(AverageHeadpositionPerLoudspeaker.get("sub_23").__len__()):
+    temp = []
+    for subject in AverageHeadpositionPerLoudspeaker.keys():
+        if subject != "all":
+            temp.append(AverageHeadpositionPerLoudspeaker.get(subject)[value])
+    AverageHeadpositionPerLoudspeaker["all"].append(np.mean(temp))
+    standarddeviationOfMean2.append(np.std(temp)/np.sqrt(temp.__len__()))
+
+for subject in AverageHeadpositionPerLoudspeaker:
+
+    y = np.array (AverageHeadpositionPerLoudspeaker.get(subject))
+    ymean = np.mean(y)
+    sxy = np.sum (x*y) -n*xmean*ymean
+    sxx = np.sum (x*x) -n*xmean*xmean
+    slope = sxy/sxx
+    intercept = ymean-slope*xmean
+
+    ypred = slope*x+intercept
+
+    error = y - ypred
+    se = np.sum(error**2)
+    mse = se/n
+    rmse = np.sqrt(mse)
+    SSt = np.sum((y-ymean)**2)
+    R2 = 1 - (se/SSt)
+
+    slope, intercept, r_value, p_value, std_err = scipy.stats.linregress(x,AverageHeadpositionPerLoudspeaker.get(subject))
+
+    participantLinRegress [subject] = [slope,intercept,mse,r_value**2,p_value, std_err]
+
+plt.errorbar(x,AverageHeadpositionPerLoudspeaker.get("all"),standarddeviationOfMean2, c= 'green', alpha = .5,ecolor='gray')
+plt.plot(x,participantLinRegress.get("all")[0]*x+participantLinRegress.get("all")[1])
+plt.plot([37.5,25.0,12.5,0.0,-12.5,-25.0,-37.5],[37.5,25.0,12.5,0.0,-12.5,-25.0,-37.5], color = 'gray', alpha=.5)
+plt.grid(alpha=.2)
+plt.xlabel("position of loudspeaker (in º)")
+plt.ylabel("average perceived position of loudspeaker (in º)")
+plt.show()
+
+#noise vs bubble
+dfvloc = pd.read_pickle("/Users/netzra/Downloads/Dataframes/vertical/locaaccu_dfv")
+#create two dictionaries, one for babble, one for noise
+babble ={}
+noise={}
+#sort data into both depending of type of stimuli
+sublist = ('sub_23', 'sub_24', 'sub_10', 'sub_08', 'sub_20', 'sub_13', 'sub_12', 'sub_22', 'sub_07', 'sub_18', 'sub_06',
+    'sub_21','sub_14', 'sub_11')
+
+for subject in sublist:
+    # 1. deciding order of adding values
+    if dfvloc.loc[subject]["mode"].dropna().to_list()[0] == "babble":
+        # go through list with halved length of index list
+        for index in range (1, int(dfvloc.loc[subject].index.to_list().__len__()/2)):
+            #checking if the actual loudspeaker on the first position of index list exists in babble dictionary
+            #if yes append
+            if dfvloc.loc[subject]["actual"][index].to_list()[0][1] in babble:
+                babble[dfvloc.loc[subject]["actual"][index].to_list()[0][1]].append(dfvloc.loc[subject]["accuracy"][index].to_list()[0][1])
+            #if no create first key - value pair for that loudspeaker
+            else:
+                babble[dfvloc.loc[subject]["actual"][index].to_list()[0][1]] = [dfvloc.loc[subject]["accuracy"][index].to_list()[0][1]]
+            #repeat the same with noise
+            if dfvloc.loc[subject]["actual"][index].to_list()[1][1] in noise:
+                noise[dfvloc.loc[subject]["actual"][index].to_list()[1][1]].append(dfvloc.loc[subject]["accuracy"][index].to_list()[1][1])
+            else:
+                noise[dfvloc.loc[subject]["actual"][index].to_list()[1][1]] = [dfvloc.loc[subject]["accuracy"][index].to_list()[1][1]]
+   # do the same thing like in 1. just with noise
+    if dfvloc.loc[subject]["mode"].dropna().to_list()[0] == "noise":
+        for index in range(1, int(dfvloc.loc[subject].index.to_list().__len__() / 2)):
+            if dfvloc.loc[subject]["actual"][index].to_list()[0][1] in noise:
+                noise[dfvloc.loc[subject]["actual"][index].to_list()[0][1]].append(dfvloc.loc[subject]["accuracy"][index].to_list()[0][1])
+            else:
+                noise[dfvloc.loc[subject]["actual"][index].to_list()[0][1]] = [dfvloc.loc[subject]["accuracy"][index].to_list()[0][1]]
+            if dfvloc.loc[subject]["actual"][index].to_list()[1][1] in babble:
+                babble[dfvloc.loc[subject]["actual"][index].to_list()[1][1]].append(dfvloc.loc[subject]["accuracy"][index].to_list()[1][1])
+            else:
+                babble[dfvloc.loc[subject]["actual"][index].to_list()[1][1]] = [dfvloc.loc[subject]["accuracy"][index].to_list()[1][1]]
+
+babble = dict(sorted(babble.items()))
+noise = dict (sorted(noise.items()))
+
+babble["mean"] = []
+babble["std"] = []
+babble["sem"] = []
+noise ["mean"] = []
+noise ["std"] = []
+noise ["sem"]=[]
+x = []
+
+for value in babble.keys():
+    if type(value) == float:
+        babble["mean"].append(np.mean(babble.get(value)))
+        babble["std"].append(np.std(babble.get(value)))
+        babble["sem"].append(np.std(babble.get(value)/np.sqrt(babble.get(value).__len__())))
+        noise ["mean"].append(np.mean(noise.get(value)))
+        noise ["std"].append(np.std(noise.get(value)))
+        noise["sem"].append(np.std(noise.get(value)/np.sqrt(noise.get(value).__len__())))
+        x.append(value)
+
+font={
+    'family':'Times New Roman',
+    'weight':'normal',
+    'size':14
+}
+matplotlib.rc('font',**font)
+pyplot.errorbar(x, noise.get("mean"),noise.get("sem"), fmt='.',ecolor='gray',color = 'black',label= 'noise')
+matplotlib.pyplot.errorbar(x, babble.get("mean"),babble.get("sem"), fmt='.',label='babble')
+matplotlib.pyplot.grid(alpha=.2)
+matplotlib.pyplot.legend()
+matplotlib.pyplot.ylabel("mean accuracy, reported position - actual position")
+matplotlib.pyplot.xlabel("position loudspeaker (º)")
+matplotlib.pyplot.show()
+
+#spatMask
+
+dfvspatMask = pd.read_pickle("/Users/netzra/Downloads/Dataframes/vertical/spatmask_dfv")
+
+sublist = (
+    'sub_23', 'sub_24', 'sub_10', 'sub_08', 'sub_20', 'sub_13', 'sub_12', 'sub_22', 'sub_07', 'sub_18', 'sub_06',
+    'sub_21',
+    'sub_14', 'sub_11')
+#"dfvspatMask.sequence.dropna()[0]["trials"]"
+loudspeakersequence = [0 for value in range(dfvspatMask.sequence.dropna().__len__())]
+thresholdperparticipant=[]
+
+for position in range(dfvspatMask.sequence.dropna().__len__()):
+    loudspeakersequence[position] = dfvspatMask.sequence.dropna()[position]["trials"]
+
+zahl = 0
+thresholdlistunsorted = dfvspatMask.threshold.dropna()
+threshholdsperloudspeaker = {
+    37.5:[],
+    25.0:[],
+    12.5:[],
+}
+
+while zahl < thresholdlistunsorted.__len__():
+    temporaer = []
+    for count in range (6):
+        temporaer.append(thresholdlistunsorted[zahl+count])
+    thresholdperparticipant.append(temporaer)
+    zahl = zahl + 6
+
+for subject in range (loudspeakersequence.__len__()):
+    for loudspeaker in range (6):
+        if loudspeakersequence[subject][loudspeaker] == 1:
+            threshholdsperloudspeaker[37.5].append(thresholdperparticipant[subject][loudspeaker])
+        elif loudspeakersequence[subject][loudspeaker] == 2:
+            threshholdsperloudspeaker[25.0].append(thresholdperparticipant[subject][loudspeaker])
+        elif loudspeakersequence[subject][loudspeaker] == 3:
+            threshholdsperloudspeaker[12.5].append(thresholdperparticipant[subject][loudspeaker])
+        elif loudspeakersequence[subject][loudspeaker] == 4:
+            threshholdsperloudspeaker[12.5].append(thresholdperparticipant[subject][loudspeaker])
+        elif loudspeakersequence[subject][loudspeaker] == 5:
+            threshholdsperloudspeaker[25.0].append(thresholdperparticipant[subject][loudspeaker])
+        else:
+            threshholdsperloudspeaker[37.5].append(thresholdperparticipant[subject][loudspeaker])
+
+
+mean = [stats.mean(x) for x in threshholdsperloudspeaker.values()]
+gradient = np.gradient(mean)
+sem = [np.std(threshholdsperloudspeaker.get(x))/np.sqrt(threshholdsperloudspeaker.get(x).__len__()) for x in threshholdsperloudspeaker.keys()]
+
+
+
+#plt.plot(threshholdsperloudspeaker.keys(), [stats.mean(x) for x in threshholdsperloudspeaker.values()])
+plt.errorbar(threshholdsperloudspeaker.keys(),
+             mean,
+             sem
+             )
+
+plt.xlabel("absolute distance of loudspeaker from the target speaker(in degrees)")
+plt.ylabel("average threshold of participants")
+plt.title("average threshold based on position of masker")
+plt.show()
+
+#plotting comparison localisation, numJudge
+x=[]
+y=[]
+y2=[]
+
+participantLinRegress.pop("all")
+participantLinRegress.pop("order")
+
+for participant in participantLinRegress:
+    x.append(participant)
+    y.append(participantLinRegress.get(participant)[0])
+
+
+for participant in dfvNum.index.get_level_values(0).dropna().drop_duplicates('first'):
+
+    temp = []
+    temp2 = []
+
+    for value in range(dfvNum.loc[participant]["response"].__len__()):
+        if dfvNum.loc[participant]["response"].to_list()[value] != None:
+            temp.append(dfvNum.loc[participant]["response"].to_list()[value])
+            temp2.append(dfvNum.loc[participant]["solution"].to_list()[value])
+
+    y2.append(metrics.mean_squared_error(temp2,temp))
+
+
+fig, ax1 = plt.subplots()
+
+ax1.plot(x,y, color = "blue")
+
+ax2 = ax1.twinx()
+ax2.plot(x, y2,color="green")
+
+ax1.set_ylabel ("slope", color="blue")
+ax2.set_ylabel("MSE",color="green")
+
+plt.xlabel("participant")
+plt.title("comparison performance Localisation (slope) vs. NumJudge(MSE)")
+plt.show()
+
+#NumJudge per participant
+import pandas as pd
+
+dfvNum = pd.read_pickle("/Users/netzra/Downloads/Dataframes/vertical/numjudge_dfv")
+
+dataNum = {}
+dataNum["order"]=[["reversed 1-6","unreversed 1-6","reversed+unreversed 1-6"]]
+
+for participant in dfvNum.index.get_level_values(0).dropna().drop_duplicates("first"):
+    dataNum[participant]=[[[]for x in range(6)]for i in range(3)]
+
+    for value in range(1, dfvNum.index.get_level_values(1).drop_duplicates("first").__len__()):
+        for reversed_speech in range(dfvNum.loc[participant]["reversed_speech"].dropna().__len__()):
+            if dfvNum.loc[participant]["reversed_speech"].dropna().to_list()[reversed_speech]:
+                dataNum[participant][0][dfvNum.loc[participant]["solution"][value].to_list()[reversed_speech]-1].append(
+                    dfvNum.loc[participant]["response"][value].to_list()[reversed_speech]
+                )
+                dataNum[participant][2][dfvNum.loc[participant]["solution"][value].to_list()[reversed_speech]-1].append(
+                    dfvNum.loc[participant]["response"][value].to_list()[reversed_speech]
+                )
+            else:
+                dataNum[participant][1][dfvNum.loc[participant]["solution"][value].to_list()[reversed_speech]-1].append(
+                    dfvNum.loc[participant]["response"][value].to_list()[reversed_speech]
+                )
+                dataNum[participant][2][dfvNum.loc[participant]["solution"][value].to_list()[reversed_speech]-1].append(
+                    dfvNum.loc[participant]["response"][value].to_list()[reversed_speech]
+                )
+
+# die subject ordnung sollte beibehalten werden
+# y sind jeweils die slope werte in reversed unreversed oder undifferenziert
+# x sind die richtigen Lösungswerte
+#scipy.stats.linregress - nimmt ein array x ein array y
+
+# localisation per participant
+import pandas as pd
+
+dfvloc = pd.read_pickle("/Users/netzra/Downloads/Dataframes/vertical/locaaccu_dfv")
+order = [37.5,25.0,12.5,0.0,-12.5,-25.0,-37.5]
+dataloc ={}
+dataloc ["order"] = ["Babble 1-7","Noise 1-7","Babble+noise1-7"]
+
+for participant in dfvloc.index.get_level_values(0).drop_duplicates():
+
+    dataloc[participant]=[[[]for x in range(order.__len__())]for i in range(3)]
+
+    for value in range (1, dfvloc.index.get_level_values(1).drop_duplicates().__len__()):
+        for mode in range(dfvloc.loc[participant]["mode"].dropna().drop_duplicates().__len__()):
+            if dfvloc.loc[participant]["mode"].dropna().to_list()[mode] == "babble":
+                dataloc[participant][0][order.index(dfvloc.loc[participant]["actual"][value].to_list()[mode][1])].append(
+                    dfvloc.loc[participant]["perceived"][value].to_list()[mode][1]
+                )
+                dataloc[participant][2][order.index(dfvloc.loc[participant]["actual"][value].to_list()[mode][1])].append(
+                    dfvloc.loc[participant]["perceived"][value].to_list()[mode][1]
+                )
+
+            else:
+                dataloc[participant][1][order.index(dfvloc.loc[participant]["actual"][value].to_list()[mode][1])].append(
+                    dfvloc.loc[participant]["perceived"][value].to_list()[mode][1]
+                )
+                dataloc[participant][2][order.index(dfvloc.loc[participant]["actual"][value].to_list()[mode][1])].append(
+                    dfvloc.loc[participant]["perceived"][value].to_list()[mode][1]
+                )
+
