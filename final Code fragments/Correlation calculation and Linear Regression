@@ -141,11 +141,12 @@ for participant in dataloc.keys():
     LinRegressSpat[participant].append(pvalue)
     LinRegressSpat[participant].append(stderr)
 
+#deletion because of for loops, to allow loop over all participants
 LinRegressSpat.pop("order")
 LinRegressNum.pop("order")
 LinRegressLoc.pop("order")
 
-#general plotting schematics
+#general plotting schematics => for reference look at the "order" entries
 
 x = []
 y = []
