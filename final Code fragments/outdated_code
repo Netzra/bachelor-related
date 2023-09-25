@@ -26,7 +26,7 @@ sol6 = []
 mean = []
 x = [2, 3, 4, 5, 6]
 
-dfvNum = pd.read_pickle("/Users/netzra/Downloads/Dataframes/vertical/numjudge_dfv")
+dfvNum = pd.read_pickle("filepath to picklefiles")
 
 for position in range(dfvNum.solution.__len__()):
     if dfvNum.solution.to_list()[position] == 2 and dfvNum.response.to_list()[position] != None:
@@ -108,7 +108,7 @@ matplotlib.pyplot.show()
 
 #reversed vs unreversed
 
-dfvNum = pd.read_pickle("/Users/netzra/Downloads/Dataframes/vertical/numjudge_dfv")
+dfvNum = pd.read_pickle("filepath to picklefiles")
 
 # what we can get : amount of experiments, type of experiment (true, false), responses and solutions
 
@@ -185,7 +185,7 @@ pyplot.show()
 # mean perceived vs actual for both reversed and unreversed, not connected lines, plus perfect performance function
 
 #localisation
-dfvloc = pd.read_pickle("/Users/netzra/Downloads/Dataframes/vertical/locaaccu_dfv")
+dfvloc = pd.read_pickle("filepath to picklefiles")
 
 actual = []
 response=[]
@@ -248,7 +248,7 @@ plt.grid(alpha=0.2)
 plt.show()
 
 #saving the data per participant
-dfvloc = pd.read_pickle("/Users/netzra/Downloads/Dataframes/vertical/locaaccu_dfv")
+dfvloc = pd.read_pickle("filepath to picklefiles")
 
 xValues = []
 
@@ -327,7 +327,7 @@ plt.ylabel("average perceived position of loudspeaker (in º)")
 plt.show()
 
 #noise vs bubble
-dfvloc = pd.read_pickle("/Users/netzra/Downloads/Dataframes/vertical/locaaccu_dfv")
+dfvloc = pd.read_pickle("filepath to picklefiles")
 #create two dictionaries, one for babble, one for noise
 babble ={}
 noise={}
@@ -401,7 +401,7 @@ matplotlib.pyplot.show()
 
 #spatMask
 
-dfvspatMask = pd.read_pickle("/Users/netzra/Downloads/Dataframes/vertical/spatmask_dfv")
+dfvspatMask = pd.read_pickle("filepath to picklefiles")
 
 sublist = (
     'sub_23', 'sub_24', 'sub_10', 'sub_08', 'sub_20', 'sub_13', 'sub_12', 'sub_22', 'sub_07', 'sub_18', 'sub_06',
@@ -505,7 +505,7 @@ plt.show()
 #NumJudge per participant
 import pandas as pd
 
-dfvNum = pd.read_pickle("/Users/netzra/Downloads/Dataframes/vertical/numjudge_dfv")
+dfvNum = pd.read_pickle("filepath to picklefiles")
 
 dataNum = {}
 dataNum["order"]=[["reversed 1-6","unreversed 1-6","reversed+unreversed 1-6"]]
@@ -538,7 +538,7 @@ for participant in dfvNum.index.get_level_values(0).dropna().drop_duplicates("fi
 # localisation per participant
 import pandas as pd
 
-dfvloc = pd.read_pickle("/Users/netzra/Downloads/Dataframes/vertical/locaaccu_dfv")
+dfvloc = pd.read_pickle("filepath to picklefiles")
 order = [37.5,25.0,12.5,0.0,-12.5,-25.0,-37.5]
 dataloc ={}
 dataloc ["order"] = ["Babble 1-7","Noise 1-7","Babble+noise1-7"]
