@@ -48,7 +48,7 @@ for participant in dfvNum.index.get_level_values(0).dropna().drop_duplicates("fi
 
 # localisation per participant
 
-dfvloc = pd.read_pickle("/Users/netzra/Downloads/Dataframes/vertical/locaaccu_dfv")
+dfvloc = pd.read_pickle("filepath to picklefiles")
 order = [37.5, 25.0, 12.5, 0.0, -12.5, -25.0, -37.5]
 dataloc = {}
 dataloc["order"] = ["Babble 1-7", "Noise 1-7", "Babble+noise1-7"]
@@ -84,7 +84,7 @@ for participant in dfvloc.index.get_level_values(0).drop_duplicates():
             dataloc[participant][type][position] = np.mean(dataloc[participant][type][position])
 # spatMask
 
-dfvspatMaskabs = pd.read_pickle("/Users/netzra/Downloads/Dataframes/vertical/spatmask_abs_distance_v")
+dfvspatMaskabs = pd.read_pickle("filepath to picklefiles")
 dataSpat = {}
 dataSpat ["order"]=[12.5,25.0,37.5]
 sublist = ('sub_06','sub_07','sub_08','sub_10','sub_11', 'sub_12','sub_13','sub_14','sub_18','sub_20','sub_21','sub_22',
