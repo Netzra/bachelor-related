@@ -1,0 +1,344 @@
+import matplotlib
+import matplotlib.pyplot as plt
+import numpy as np
+
+import scipy.stats as stats
+
+# SpatMask plot fuer alle participants -> CorrelationCalc
+import matplotlib.pyplot as plt
+
+x = [12.5,25.0,37.5]
+y2 =[]
+standarderrOfMean =[]
+temp = [[]for i in range (3)]
+
+for participant in dataSpat:
+    for value in range(len(dataSpat[participant])):
+        temp[value].append(dataSpat[participant][value])
+
+
+for list in temp:
+    standarderrOfMean.append(np.std(list)/np.sqrt(list.__len__()))
+    y.append(np.mean(list))
+slope, intercept,rvalue,pvalue,stderr = stats.linregress([12.5,25.0,37.5], y)
+
+for value in x:
+    y2.append(slope*value+intercept)
+font={
+    'family':'Times New Roman',
+    'weight':'normal',
+    'size':14
+}
+matplotlib.rc('font',**font)
+plt.errorbar(x,y,standarderrOfMean, alpha=.5, color='gray')
+plt.plot(x, y2)
+plt.grid(alpha=0.2, color='gray')
+plt.ylabel("average unmasking threshold, Target - Masker (dB)")
+plt.xlabel("absolute distance to 0.0 (º)")
+plt.plot()
+#__________________________________________________________________________________________
+
+def add_headers(
+    fig,
+    *,
+    row_headers=None,
+    col_headers=None,
+    row_pad=1,
+    col_pad=5,
+    rotate_row_headers=True,
+    **text_kwargs
+):
+    # Based on https://stackoverflow.com/a/25814386
+
+    axes = fig.get_axes()
+
+    for ax in axes:
+        sbs = ax.get_subplotspec()
+
+        # Putting headers on cols
+        if (col_headers is not None) and sbs.is_first_row():
+            ax.annotate(
+                col_headers[sbs.colspan.start],
+                xy=(0.5, 1),
+                xytext=(0, col_pad),
+                xycoords="axes fraction",
+                textcoords="offset points",
+                ha="center",
+                va="baseline",
+                **text_kwargs,
+            )
+
+        # Putting headers on rows
+        if (row_headers is not None) and sbs.is_first_col():
+            ax.annotate(
+                row_headers[sbs.rowspan.start],
+                xy=(0, 0.5),
+                xytext=(-ax.yaxis.labelpad - row_pad, 0),
+                xycoords=ax.yaxis.label,
+                textcoords="offset points",
+                ha="right",
+                va="center",
+                rotation=rotate_row_headers * 90,
+                **text_kwargs,
+            )
+
+figure, axs = plt.subplots(nrows=3,ncols=3,sharey='col',sharex='row')
+
+row_headers=["B+N","B","N"]
+col_headers=["R+C","R","C"]
+
+x1 = []
+y1 = []
+r2 = []
+pvals = []
+pCorr = {
+    'val': [],
+    'p': []
+}
+slopevals=[]
+
+for participant in LinRegressSpat:
+    x1.append(LinRegressLoc[participant][2][0])
+    y1.append(LinRegressNum[participant][2][0])
+
+slope, intercept, r, p, se= stats.linregress(x1,y1)
+r2.append(r**2)
+pvals.append(p)
+test = stats.pearsonr(x1,y1)
+pCorr['val'].append(test.statistic)
+pCorr['p'].append(test.pvalue)
+
+axs[0,0].scatter(x1,y1, color='gray',alpha=.5)
+axs[0,0].grid(alpha=.2)
+axs[0,0].plot(x1,[slope*value+intercept for value in x1])
+
+x1 = []
+y1 = []
+
+for participant in LinRegressSpat:
+    x1.append(LinRegressLoc[participant][0][0])
+    y1.append(LinRegressNum[participant][2][0])
+
+slope, intercept, r, p, se= stats.linregress(x1,y1)
+r2.append(r**2)
+pvals.append(p)
+test = stats.pearsonr(x1,y1)
+pCorr['val'].append(test.statistic)
+pCorr['p'].append(test.pvalue)
+
+axs[1,0].scatter(x1,y1, color='gray',alpha=.5)
+axs[1,0].grid(alpha=.2)
+axs[1,0].plot(x1,[slope*value+intercept for value in x1])
+
+x1 = []
+y1 = []
+
+for participant in LinRegressSpat:
+    x1.append(LinRegressLoc[participant][1][0])
+    y1.append(LinRegressNum[participant][2][0])
+
+slope, intercept, r, p, se= stats.linregress(x1,y1)
+r2.append(r**2)
+pvals.append(p)
+test = stats.pearsonr(x1,y1)
+pCorr['val'].append(test.statistic)
+pCorr['p'].append(test.pvalue)
+
+axs[2,0].scatter(x1,y1, color='gray',alpha=.5)
+axs[2,0].grid(alpha=.2)
+axs[2,0].plot(x1,[slope*value+intercept for value in x1])
+
+x1 = []
+y1 = []
+
+for participant in LinRegressSpat:
+    x1.append(LinRegressLoc[participant][2][0])
+    y1.append(LinRegressNum[participant][1][0])
+
+slope, intercept, r, p, se= stats.linregress(x1,y1)
+r2.append(r**2)
+pvals.append(p)
+test = stats.pearsonr(x1,y1)
+pCorr['val'].append(test.statistic)
+pCorr['p'].append(test.pvalue)
+
+axs[0,1].scatter(x1,y1, color='gray',alpha=.5)
+axs[0,1].grid(alpha=.2)
+axs[0,1].plot(x1,[slope*value+intercept for value in x1])
+
+x1 = []
+y1 = []
+
+for participant in LinRegressSpat:
+    x1.append(LinRegressLoc[participant][0][0])
+    y1.append(LinRegressNum[participant][1][0])
+
+slope, intercept, r, p, se= stats.linregress(x1,y1)
+r2.append(r**2)
+pvals.append(p)
+test = stats.pearsonr(x1,y1)
+pCorr['val'].append(test.statistic)
+pCorr['p'].append(test.pvalue)
+
+axs[1,1].scatter(x1,y1, color='gray',alpha=.5)
+axs[1,1].grid(alpha=.2)
+axs[1,1].plot(x1,[slope*value+intercept for value in x1])
+
+x1 = []
+y1 = []
+
+for participant in LinRegressSpat:
+    x1.append(LinRegressLoc[participant][1][0])
+    y1.append(LinRegressNum[participant][1][0])
+
+slope, intercept, r, p, se= stats.linregress(x1,y1)
+r2.append(r**2)
+pvals.append(p)
+test = stats.pearsonr(x1,y1)
+pCorr['val'].append(test.statistic)
+pCorr['p'].append(test.pvalue)
+
+axs[2,1].scatter(x1,y1, color='gray',alpha=.5)
+axs[2,1].grid(alpha=.2)
+axs[2,1].plot(x1,[slope*value+intercept for value in x1])
+
+x1 = []
+y1 = []
+
+for participant in LinRegressSpat:
+    x1.append(LinRegressLoc[participant][2][0])
+    y1.append(LinRegressNum[participant][0][0])
+
+slope, intercept, r, p, se= stats.linregress(x1,y1)
+r2.append(r**2)
+pvals.append(p)
+test = stats.pearsonr(x1,y1)
+pCorr['val'].append(test.statistic)
+pCorr['p'].append(test.pvalue)
+
+axs[0,2].scatter(x1,y1, color='gray',alpha=.5)
+axs[0,2].grid(alpha=.2)
+axs[0,2].plot(x1,[slope*value+intercept for value in x1])
+
+x1 = []
+y1 = []
+
+for participant in LinRegressSpat:
+    x1.append(LinRegressLoc[participant][0][0])
+    y1.append(LinRegressNum[participant][0][0])
+
+slope, intercept, r, p, se= stats.linregress(x1,y1)
+r2.append(r**2)
+pvals.append(p)
+test = stats.pearsonr(x1,y1)
+pCorr['val'].append(test.statistic)
+pCorr['p'].append(test.pvalue)
+
+axs[1,2].scatter(x1,y1, color='gray',alpha=.5)
+axs[1,2].grid(alpha=.2)
+axs[1,2].plot(x1,[slope*value+intercept for value in x1])
+
+x1 = []
+y1 = []
+
+for participant in LinRegressSpat:
+    x1.append(LinRegressLoc[participant][1][0])
+    y1.append(LinRegressNum[participant][0][0])
+
+slope, intercept, r, p, se= stats.linregress(x1,y1)
+r2.append(r**2)
+pvals.append(p)
+test = stats.pearsonr(x1,y1)
+pCorr['val'].append(test.statistic)
+pCorr['p'].append(test.pvalue)
+
+axs[2,2].scatter(x1,y1, color='gray',alpha=.5)
+axs[2,2].grid(alpha=.2)
+axs[2,2].plot(x1,[slope*value+intercept for value in x1])
+
+add_headers(figure,col_headers=col_headers,row_headers=row_headers)
+
+plt.show()
+
+# -----------------------------------------------------------------------------------------
+import matplotlib.pyplot as plt
+
+x = [2,3,4,5,6]
+y = []
+y2 =[]
+standarderrOfMean =[]
+temp = [[]for i in range (5)]
+
+for participant in dataNum:
+    for value in range(len(dataNum[participant][2])):
+        temp[value].append(dataNum[participant][2][value])
+
+
+for list in temp:
+    standarderrOfMean.append(np.std(list)/np.sqrt(list.__len__()))
+    y.append(np.mean(list))
+slope, intercept,rvalue,pvalue,stderr = stats.linregress(x, y)
+
+for value in x:
+    y2.append(slope*value+intercept)
+
+font={
+    'family':'Times New Roman',
+    'weight':'normal',
+    'size':14
+
+}
+matplotlib.rc('font',**font)
+plt.errorbar(x,y,standarderrOfMean, alpha=.8)
+plt.plot(x, y2, color='green')
+plt.plot(x,x, alpha=.5, color='gray')
+plt.grid(alpha=0.2, color='gray')
+plt.ylabel("average perceived amount of speaker")
+plt.plot()
+
+#______________________________________________________________________
+#Histogram plotting
+#______________________________________________________________________
+x = [1,2,3,4,5,6]
+plt.hist(unreversed[6])
+plt.xticks(x)
+plt.show()
+# ________________________
+# Plotting distirbution of participants during num Judge
+#_________________________
+
+
+#create scatter plot for reveresed and clear speech
+# requieres datapoint for each participant devided by actual speaker amount
+
+tempr = {
+    0:[],
+    1:[],
+    2:[],
+    3:[],
+    4:[],
+}
+tempc={
+    0:[],
+    1:[],
+    2:[],
+    3:[],
+    4:[],
+}
+x = [2,3,4,5,6]
+
+for participant in dataNum:
+    for value in range(len(x)):
+        tempr[value].append(dataNum[participant][0][value])
+        tempc[value].append(dataNum[participant][1][value])
+
+for key in tempr.keys():
+    plt.scatter([int(x[key])]*len(tempr[key]),tempr[key],color='blue')
+    plt.scatter([int(x[key])]*len(tempc[key]),tempc[key],color='black')
+
+plt.plot(x,x,color='gray',alpha=.8)
+plt.grid(alpha=.2)
+plt.show()
+
+
+
